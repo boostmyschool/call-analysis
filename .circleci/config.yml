@@ -1,0 +1,25 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.4-node-browsers
+    steps:
+      - checkout
+
+      # Install python deps
+      - restore_cache:
+          key: pip-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - run:
+          command: |
+            python3 -m venv ~/venv
+            echo "source ~/venv/bin/activate" >> $BASH_ENV
+      - run:
+          command: |
+            pip install -r requirements.txt
+      - save_cache:
+          key: pip-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - "~/venv"
+
+      - run: make lint
