@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import csv
 import sys
 
 from src.cold_call_collection import ColdCallCollection
