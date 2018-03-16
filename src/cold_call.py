@@ -20,5 +20,5 @@ class ColdCall(object):
         return str(self._attrs)
 
     @property
-    def hour(self):
-        return self.datetime.hour
+    def day_of_week(self):
+        return self.datetime.strftime('%a')

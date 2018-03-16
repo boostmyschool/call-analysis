@@ -72,3 +72,16 @@ class ColdCallCollection(object):
             groups[key].append(call)
 
         return OrderedDict(sorted(groups.items()))
+
+    def grouped_by_day(self):
+        DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+
+        groups = OrderedDict()
+        for day in DAYS:
+            groups[day] = ColdCallCollection()
+
+        for call in self._calls:
+            key = call.day_of_week
+            groups[key].append(call)
+
+        return groups
