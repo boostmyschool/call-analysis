@@ -1,6 +1,13 @@
 import csv
+from collections import OrderedDict
+from datetime import datetime, timedelta
 
 from .cold_call import ColdCall
+
+# This rounds down to nearest delta (e.g. nearest hour)
+# https://stackoverflow.com/questions/32723150/rounding-up-to-nearest-30-minutes-in-python?answertab=votes#tab-top
+def round_time(time, delta):
+    return time - ((time - datetime.min) % delta)
 
 class ColdCallCollection(object):
     ATTRIBUTES = ['date', 'time', 'name', 'state_code', 'picked_up', 'booked_meeting']
@@ -49,17 +56,19 @@ class ColdCallCollection(object):
     def meetings_count(self):
         return len([call for call in self._calls if call.booked_meeting])
 
-    def grouped_by_time(self):
-        # Aggregate data by hour
+    def grouped_by_time(self, delta=None):
+        # Aggregate data by hour by default
+        if not delta:
+            delta = timedelta(hours=1)
 
         groups = {}
 
         for call in self._calls:
-            key = call.hour
+            key = round_time(call.datetime, delta).strftime('%H:%M')
 
             if key not in groups:
                 groups[key] = ColdCallCollection()
 
             groups[key].append(call)
 
-        return groups
+        return OrderedDict(sorted(groups.items()))

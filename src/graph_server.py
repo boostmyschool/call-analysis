@@ -2,6 +2,12 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+from datetime import timedelta
+
+def calc_percentage(num, den):
+    if den == 0:
+        return 0
+    return 100.0 * num / den
 
 class GraphServer(object):
     def __init__(self, calls):
@@ -20,12 +26,11 @@ class GraphServer(object):
         return app
 
     def _init_calls_by_time_graphs(self):
-        calls_by_time = self._calls.grouped_by_time()
-
         times = []
         total_count = []
         picked_up_count = []
         meetings_count = []
+        calls_by_time = self._calls.grouped_by_time(delta=timedelta(minutes=30))
 
         for time, calls in calls_by_time.items():
             times.append(time)
@@ -69,17 +74,17 @@ class GraphServer(object):
                     go.Bar(
                         name='% picked up',
                         x=times,
-                        y=[100.0 * num / den for den, num in zip(total_count, picked_up_count)],
+                        y=[calc_percentage(num, den) for den, num in zip(total_count, picked_up_count)],
                     ),
                     go.Bar(
                         name='% meeting',
                         x=times,
-                        y=[100.0 * num / den for den, num in zip(total_count, meetings_count)],
+                        y=[calc_percentage(num, den) for den, num in zip(total_count, meetings_count)],
                     ),
                     go.Bar(
                         name='% meeting if picked up',
                         x=times,
-                        y=[100.0 * num / den for den, num in zip(picked_up_count, meetings_count)],
+                        y=[calc_percentage(num, den) for den, num in zip(picked_up_count, meetings_count)],
                     ),
                 ],
             ),
